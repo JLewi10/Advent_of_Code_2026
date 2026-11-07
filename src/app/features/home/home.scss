@@ -1,0 +1,228 @@
+.dashboard {
+  box-sizing: border-box;
+  display: grid;
+  gap: 1.5rem;
+  width: min(1200px, calc(100% - 3rem));
+  margin: 1.5rem auto;
+  padding-bottom: 2rem;
+}
+
+.welcome-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-1);
+}
+
+.welcome-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.welcome-panel h1 {
+  margin: 0;
+  color: var(--calcite-color-text-1);
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+}
+
+.welcome-panel__copy > p {
+  margin: 0.5rem 0 0;
+  color: var(--calcite-color-text-2);
+}
+
+.progress-summary {
+  flex: 0 0 min(16rem, 36%);
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-2);
+}
+
+.progress-summary__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+  color: var(--calcite-color-text-1);
+  font-size: 0.8rem;
+}
+
+.progress-summary__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.progress-summary__count calcite-icon {
+  color: #f2c94c;
+}
+
+.progress-summary > p {
+  margin: 0.4rem 0 0;
+  color: var(--calcite-color-text-2);
+  text-align: right;
+}
+
+.day-browser {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-1);
+}
+
+.search-box {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1 1 18rem;
+  min-width: 14rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--calcite-color-border-3);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-2);
+  color: var(--calcite-color-text-2);
+}
+
+.search-box:focus-within {
+  outline: 2px solid var(--calcite-color-brand);
+}
+
+.search-box input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--calcite-color-text-1);
+  font: inherit;
+}
+
+.status-filters {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filter-button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-2);
+  color: var(--calcite-color-text-1);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.filter-button:focus-visible {
+  outline: 2px solid var(--calcite-color-brand);
+  outline-offset: 2px;
+}
+
+.filter-button--active,
+.filter-button--active:hover {
+  border-color: var(--calcite-color-brand);
+  background: var(--calcite-color-brand);
+  color: var(--calcite-color-text-inverse);
+}
+
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1rem;
+}
+
+.day-card {
+  --calcite-card-background-color: var(--calcite-color-foreground-1);
+  --calcite-card-border-color: var(--calcite-color-border-2);
+}
+
+.day-card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--calcite-color-text-2);
+  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid currentColor;
+  border-radius: var(--calcite-corner-radius);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.status-badge[data-status='not-started'] {
+  color: var(--calcite-color-text-2);
+}
+
+.status-badge[data-status='in-progress'] {
+  color: var(--calcite-color-brand);
+}
+
+.status-badge[data-status='partially-solved'] {
+  color: #e6a700;
+}
+
+.status-badge[data-status='fully-solved'] {
+  color: #4caf74;
+}
+
+.day-card__title {
+  margin: 0.25rem 0 1.25rem;
+  color: var(--calcite-color-text-1);
+  font-size: 1rem;
+}
+
+.day-card__stars {
+  display: flex;
+  gap: 0.35rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--calcite-color-border-2);
+  color: var(--calcite-color-text-3);
+}
+
+.day-card__star--earned {
+  color: #f2c94c;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--calcite-color-border-2);
+  color: var(--calcite-color-text-2);
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .dashboard {
+    width: calc(100% - 2rem);
+    margin-top: 1rem;
+  }
+
+  .welcome-panel {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1rem;
+  }
+
+  .progress-summary {
+    flex-basis: auto;
+  }
+}

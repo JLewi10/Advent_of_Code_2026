@@ -1,1 +1,90 @@
-<p>home works!</p>
+<main class="dashboard">
+  <header class="welcome-panel">
+    <div class="welcome-panel__copy">
+      <div class="welcome-panel__title">
+        <calcite-icon icon="code" scale="m" aria-hidden="true"></calcite-icon>
+        <h1>Advent of Code 2026</h1>
+      </div>
+      <p>
+        Choose a day to open the web editor, write a solution, and keep track of
+        your progress.
+      </p>
+    </div>
+
+    <section class="progress-summary" aria-label="Overall progress">
+      <div class="progress-summary__label">
+        <span>Total Stars / Stars Progress</span>
+        <span class="progress-summary__count">
+          {{ solvedStars() }} <calcite-icon icon="star-f" aria-hidden="true"></calcite-icon>
+        </span>
+      </div>
+      <calcite-meter
+        label="Overall Advent of Code progress"
+        [min]="0"
+        [max]="totalStars"
+        [value]="solvedStars()"
+        appearance="solid"
+        fill-type="single"
+      ></calcite-meter>
+      <p>{{ progressPercent() }}% completed</p>
+    </section>
+  </header>
+
+  <section class="day-browser" aria-label="Find a puzzle day">
+    <label class="search-box">
+      <calcite-icon icon="search" aria-hidden="true"></calcite-icon>
+      <input
+        type="search"
+        aria-label="Search by day number or title"
+        placeholder="Search by day number or title..."
+        [value]="searchQuery()"
+        (input)="updateSearch($event)"
+      />
+    </label>
+
+    <div class="status-filters" role="group" aria-label="Filter days by status">
+      @for (filter of filters; track filter.value) {
+        <button
+          type="button"
+          class="filter-button"
+          [class.filter-button--active]="activeFilter() === filter.value"
+          [attr.aria-pressed]="activeFilter() === filter.value"
+          (click)="setFilter(filter.value)"
+        >
+          {{ filter.label }}
+          @if (filter.value === 'all') {
+            ({{ days.length }})
+          }
+        </button>
+      }
+    </div>
+  </section>
+
+  @if (filteredDays().length > 0) {
+    <section class="day-grid" aria-label="Advent of Code days">
+      @for (day of filteredDays(); track day.number) {
+        <calcite-card class="day-card">
+          <div class="day-card__heading" slot="heading">
+            <span>DAY {{ day.number.toString().padStart(2, '0') }}</span>
+            <span class="status-badge" [attr.data-status]="day.status">
+              {{ statusLabels[day.status] }}
+            </span>
+          </div>
+          <h2 class="day-card__title">{{ day.title }}</h2>
+          <div class="day-card__stars" slot="footer-start" aria-label="{{ day.stars }} of 2 stars earned">
+            @for (star of [1, 2]; track star) {
+              <calcite-icon
+                [icon]="star <= day.stars ? 'star-f' : 'star'"
+                scale="s"
+                [class.day-card__star--earned]="star <= day.stars"
+                aria-hidden="true"
+              ></calcite-icon>
+            }
+          </div>
+        </calcite-card>
+      }
+    </section>
+  } @else {
+    <p class="empty-state" role="status">No days match your search and status filter.</p>
+  }
+</main>

@@ -1,1 +1,21 @@
-<router-outlet />
+<calcite-shell>
+  <calcite-navigation slot="header">
+    <calcite-navigation-logo
+      slot="logo"
+      heading="Advent of Code"
+      description="2026 Progress Tracker"
+      icon="package"
+    ></calcite-navigation-logo>
+    <calcite-navigation-user
+      slot="user"
+      full-name="Jason Lewis"
+      username="JLewi10"
+    ></calcite-navigation-user>
+    <calcite-chip slot="content-end" icon="star-f"
+      >Solved <b>{{ solvedCount() }} / 50</b></calcite-chip
+    >
+  </calcite-navigation>
+  <calcite-panel slot="panel-top">
+    <router-outlet />
+  </calcite-panel>
+</calcite-shell>

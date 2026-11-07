@@ -57,3 +57,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use the `providedIn: 'root'` option for singleton services
 - Prefer the `@Service` decorator over `@Injectable({providedIn: 'root'})` for new singleton services (Angular v22+)
 - Use the `inject()` function instead of constructor injection
+
+## Testing
+
+- Do not create or modify spec files unless explicitly asked to write or update tests.
+- Do not run tests unless explicitly asked to run them.

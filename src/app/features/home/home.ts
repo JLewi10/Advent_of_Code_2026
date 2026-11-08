@@ -1,65 +1,56 @@
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import {
+  DAY_STATUSES,
+  DAY_STATUS_LABELS,
+  ProgressService,
+  TOTAL_STARS,
+  type DayStatus,
+  type PuzzleDay,
+} from '../../core/services';
 
 import '@esri/calcite-components/components/calcite-card';
 import '@esri/calcite-components/components/calcite-icon';
 import '@esri/calcite-components/components/calcite-meter';
 
-type DayStatus = 'not-started' | 'in-progress' | 'partially-solved' | 'fully-solved';
 type DayFilter = 'all' | DayStatus;
 
-interface PuzzleDay {
-  number: number;
-  title: string;
-  status: DayStatus;
-  stars: number;
-}
-
 @Component({
-  imports: [],
+  imports: [RouterLink],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   selector: 'app-home',
   styleUrl: './home.scss',
   templateUrl: './home.html',
 })
 export class Home {
-  protected readonly totalStars = 50;
-  protected readonly days: PuzzleDay[] = Array.from({ length: 25 }, (_, index) => {
-    const number = index + 1;
-    return {
-      number,
-      title: `Day ${number} Puzzle`,
-      status: 'not-started',
-      stars: 0,
-    };
-  });
-  protected readonly statusLabels: Record<DayStatus, string> = {
-    'not-started': 'Not Started',
-    'in-progress': 'In Progress',
-    'partially-solved': 'Part 1 Solved',
-    'fully-solved': 'Fully Solved',
-  };
+  protected readonly progress = inject(ProgressService);
+  protected readonly totalStars = TOTAL_STARS;
+  protected readonly days = this.progress.days;
+  protected readonly editingDayNumber = signal<number | null>(null);
+  protected readonly draftTitle = signal('');
+  protected readonly draftStatus = signal<DayStatus>('in-progress');
+  protected readonly editError = signal<string | null>(null);
+  protected readonly statuses = DAY_STATUSES;
+  protected readonly statusLabels = DAY_STATUS_LABELS;
   protected readonly filters: { label: string; value: DayFilter }[] = [
     { label: 'All Days', value: 'all' },
-    { label: 'Not Started', value: 'not-started' },
-    { label: 'In Progress', value: 'in-progress' },
-    { label: 'Part 1 Solved', value: 'partially-solved' },
-    { label: 'Fully Solved', value: 'fully-solved' },
+    ...DAY_STATUSES,
   ];
 
   protected readonly activeFilter = signal<DayFilter>('all');
   protected readonly searchQuery = signal('');
-  protected readonly solvedStars = computed(() =>
-    this.days.reduce((total, day) => total + day.stars, 0),
-  );
+  protected readonly solvedStars = this.progress.solvedCount;
   protected readonly progressPercent = computed(() =>
     Math.round((this.solvedStars() / this.totalStars) * 100),
   );
   protected readonly filteredDays = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
     const filter = this.activeFilter();
+    const editingDayNumber = this.editingDayNumber();
 
-    return this.days.filter((day) => {
-      const matchesFilter = filter === 'all' || day.status === filter;
+    return this.days().filter((day) => {
+      const matchesFilter =
+        filter === 'all' || day.status === filter || day.number === editingDayNumber;
       const dayNumber = day.number.toString();
       const paddedDayNumber = dayNumber.padStart(2, '0');
       const matchesSearch =
@@ -82,5 +73,51 @@ export class Home {
 
   protected setFilter(filter: DayFilter): void {
     this.activeFilter.set(filter);
+  }
+
+  protected beginEdit(day: PuzzleDay): void {
+    const status = day.status === 'not-started' ? 'in-progress' : day.status;
+    if (status !== day.status) {
+      this.progress.updateDay(day.number, { status });
+    }
+
+    this.editingDayNumber.set(day.number);
+    this.draftTitle.set(day.title);
+    this.draftStatus.set(status);
+    this.editError.set(null);
+  }
+
+  protected updateDraftTitle(event: Event): void {
+    this.draftTitle.set((event.target as HTMLInputElement).value);
+  }
+
+  protected updateDraftStatus(event: Event): void {
+    const status = (event.target as HTMLSelectElement).value;
+    if (this.isDayStatus(status)) {
+      this.draftStatus.set(status);
+    }
+  }
+
+  protected saveDayEdit(day: PuzzleDay): void {
+    const title = this.draftTitle().trim();
+    if (!title) {
+      this.editError.set('Enter a title for this day before saving.');
+      return;
+    }
+
+    this.progress.updateDay(day.number, {
+      title,
+      status: this.draftStatus(),
+    });
+    this.editingDayNumber.set(null);
+  }
+
+  protected cancelDayEdit(): void {
+    this.editingDayNumber.set(null);
+    this.editError.set(null);
+  }
+
+  private isDayStatus(status: string): status is DayStatus {
+    return DAY_STATUSES.some((option) => option.value === status);
   }
 }

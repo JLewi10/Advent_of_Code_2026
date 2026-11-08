@@ -1,0 +1,232 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.day-workspace {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  color: var(--calcite-color-text-1);
+}
+
+.day-header {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--calcite-color-border-2);
+  background: var(--calcite-color-foreground-1);
+}
+
+.day-header__identity,
+.day-header__actions,
+.day-header__parts {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.day-header__identity {
+  min-width: 0;
+}
+
+.day-header__identity h1 {
+  overflow: hidden;
+  margin: 0;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-header__number {
+  flex: 0 0 auto;
+  --calcite-chip-background-color: var(--calcite-color-brand);
+  --calcite-chip-text-color: var(--calcite-color-text-inverse);
+}
+
+.day-header__parts {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.day-header__parts calcite-chip {
+  --calcite-chip-icon-color: var(--calcite-color-text-2);
+}
+
+.day-header__run {
+  flex: 0 0 auto;
+}
+
+.editor-section {
+  display: flex;
+  min-height: 16rem;
+  flex: 1 1 16rem;
+  flex-direction: column;
+  border-bottom: 1px solid var(--calcite-color-border-2);
+  background: var(--calcite-color-foreground-1);
+}
+
+.editor-section__toolbar {
+  display: flex;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid var(--calcite-color-border-2);
+  color: var(--calcite-color-text-2);
+  font-size: 0.75rem;
+}
+
+.editor-section__toolbar label {
+  color: var(--calcite-color-text-1);
+  font-family: var(--calcite-font-family-monospace);
+}
+
+.code-editor,
+.puzzle-input {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  border: 0;
+  outline: 0;
+  background: var(--calcite-color-foreground-1);
+  color: var(--calcite-color-text-1);
+  font-family: var(--calcite-font-family-monospace);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  tab-size: 2;
+}
+
+.code-editor {
+  min-height: 13rem;
+  flex: 1 1 auto;
+  padding: 0.75rem;
+}
+
+.code-editor:focus-visible,
+.puzzle-input:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--calcite-color-brand);
+}
+
+.code-editor::placeholder,
+.puzzle-input::placeholder {
+  color: var(--calcite-color-text-3);
+}
+
+.input-section {
+  padding: 0.75rem 1rem 1rem;
+  border-bottom: 1px solid var(--calcite-color-border-2);
+  background: var(--calcite-color-foreground-1);
+}
+
+.section-heading,
+.results-section__heading,
+.result-panel__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section-heading {
+  margin-bottom: 0.5rem;
+  color: var(--calcite-color-text-1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.section-heading span,
+.result-panel__heading > span {
+  color: var(--calcite-color-text-2);
+  font-family: var(--calcite-font-family-monospace);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.puzzle-input {
+  display: block;
+  min-height: 7rem;
+  padding: 0.75rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+}
+
+.results-section {
+  padding: 0.75rem 1rem 1rem;
+  background: var(--calcite-color-foreground-1);
+}
+
+.results-section__heading {
+  margin-bottom: 0.75rem;
+}
+
+.results-section__heading h2,
+.result-panel__heading h3 {
+  margin: 0;
+  color: var(--calcite-color-text-1);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.results-section__runtime {
+  color: var(--calcite-color-brand);
+  font-family: var(--calcite-font-family-monospace);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+}
+
+.result-panel {
+  min-height: 4rem;
+  padding: 0.75rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-2);
+}
+
+.result-panel pre {
+  overflow: auto;
+  margin: 0.5rem 0 0;
+  color: var(--calcite-color-text-2);
+  font-family: var(--calcite-font-family-monospace);
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+}
+
+.day-error {
+  padding: 1rem;
+  color: var(--calcite-color-status-danger);
+}
+
+.day-error a {
+  color: var(--calcite-color-brand);
+}
+
+@media (max-width: 44rem) {
+  .day-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .day-header__actions {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 32rem) {
+  .day-header__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .day-header__parts {
+    justify-content: flex-start;
+  }
+}

@@ -55,11 +55,14 @@
         >
           {{ filter.label }}
           @if (filter.value === 'all') {
-            ({{ days.length }})
+            ({{ days().length }})
           }
         </button>
       }
     </div>
+    @if (progress.storageError(); as error) {
+      <p class="storage-error" role="alert">{{ error }}</p>
+    }
   </section>
 
   @if (filteredDays().length > 0) {
@@ -68,11 +71,59 @@
         <calcite-card class="day-card">
           <div class="day-card__heading" slot="heading">
             <span>DAY {{ day.number.toString().padStart(2, '0') }}</span>
-            <span class="status-badge" [attr.data-status]="day.status">
-              {{ statusLabels[day.status] }}
-            </span>
+            @if (editingDayNumber() === day.number) {
+              <span class="status-badge" [attr.data-status]="day.status">
+                {{ statusLabels[day.status] }}
+              </span>
+            } @else {
+              <button
+                type="button"
+                class="status-badge"
+                [attr.data-status]="day.status"
+                [attr.aria-label]="'Edit status and title for day ' + day.number"
+                (click)="beginEdit(day)"
+              >
+                {{ statusLabels[day.status] }}
+              </button>
+            }
           </div>
-          <h2 class="day-card__title">{{ day.title }}</h2>
+          @if (editingDayNumber() === day.number) {
+            <div class="day-card__editor">
+              <label [for]="'day-title-' + day.number">Custom title</label>
+              <input
+                [id]="'day-title-' + day.number"
+                type="text"
+                maxlength="100"
+                [value]="draftTitle()"
+                (input)="updateDraftTitle($event)"
+              />
+              <label [for]="'day-status-' + day.number">Status</label>
+              <select
+                [id]="'day-status-' + day.number"
+                [value]="draftStatus()"
+                (change)="updateDraftStatus($event)"
+              >
+                @for (status of statuses; track status.value) {
+                  <option [value]="status.value">{{ status.label }}</option>
+                }
+              </select>
+              @if (editError(); as error) {
+                <p class="day-card__edit-error" role="alert">{{ error }}</p>
+              }
+              <div class="day-card__editor-actions">
+                <button type="button" (click)="saveDayEdit(day)">Save</button>
+                <button type="button" (click)="cancelDayEdit()">Cancel</button>
+              </div>
+            </div>
+          } @else {
+            <a
+              class="day-card__title"
+              [routerLink]="['/day', day.number]"
+              [attr.aria-label]="'Open day ' + day.number + ': ' + day.title"
+            >
+              <h2>{{ day.title }}</h2>
+            </a>
+          }
           <div
             class="day-card__stars"
             slot="footer-start"

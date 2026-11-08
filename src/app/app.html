@@ -6,6 +6,15 @@
       description="2026 Progress Tracker"
       icon="package"
     ></calcite-navigation-logo>
+    @if (!isDashboard()) {
+      <calcite-menu slot="content-end">
+        <calcite-menu-item
+          [routerLink]="['/']"
+          text="Return to dashboard"
+          icon-start="home"
+        ></calcite-menu-item>
+      </calcite-menu>
+    }
     <calcite-navigation-user
       slot="user"
       full-name="Jason Lewis"

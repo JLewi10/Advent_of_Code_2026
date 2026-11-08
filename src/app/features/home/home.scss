@@ -1,14 +1,29 @@
+:host {
+  box-sizing: border-box;
+  container-name: home-layout;
+  container-type: size;
+  display: block;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+
 .dashboard {
   box-sizing: border-box;
   display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
   gap: 1.5rem;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   width: min(1200px, calc(100% - 3rem));
-  margin: 1.5rem auto;
-  padding-bottom: 2rem;
+  margin: 0 auto;
+  padding: 1.5rem 0 2rem;
 }
 
 .welcome-panel {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
@@ -70,6 +85,7 @@
 
 .day-browser {
   display: flex;
+  min-width: 0;
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
@@ -138,10 +154,21 @@
   color: var(--calcite-color-text-inverse);
 }
 
+.storage-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--calcite-color-status-danger);
+  font-size: 0.875rem;
+}
+
 .day-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  align-content: start;
   gap: 1rem;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
 }
 
 .day-card {
@@ -163,8 +190,20 @@
   padding: 0.25rem 0.5rem;
   border: 1px solid currentColor;
   border-radius: var(--calcite-corner-radius);
+  background: transparent;
+  color: var(--calcite-color-text-2);
+  font: inherit;
   font-size: 0.7rem;
   white-space: nowrap;
+}
+
+button.status-badge {
+  cursor: pointer;
+}
+
+button.status-badge:focus-visible {
+  outline: 2px solid var(--calcite-color-brand);
+  outline-offset: 2px;
 }
 
 .status-badge[data-status='not-started'] {
@@ -184,9 +223,77 @@
 }
 
 .day-card__title {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.day-card__title h2 {
   margin: 0.25rem 0 1.25rem;
   color: var(--calcite-color-text-1);
   font-size: 1rem;
+}
+
+.day-card__editor {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.25rem 0 1rem;
+}
+
+.day-card__editor label {
+  color: var(--calcite-color-text-2);
+  font-size: 0.75rem;
+}
+
+.day-card__editor input,
+.day-card__editor select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-2);
+  color: var(--calcite-color-text-1);
+  font: inherit;
+}
+
+.day-card__editor input:focus-visible,
+.day-card__editor select:focus-visible {
+  outline: 2px solid var(--calcite-color-brand);
+  outline-offset: 1px;
+}
+
+.day-card__edit-error {
+  margin: 0;
+  color: var(--calcite-color-status-danger);
+  font-size: 0.75rem;
+}
+
+.day-card__editor-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.day-card__editor-actions button {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--calcite-color-border-2);
+  border-radius: var(--calcite-corner-radius);
+  background: var(--calcite-color-foreground-2);
+  color: var(--calcite-color-text-1);
+  cursor: pointer;
+  font: inherit;
+}
+
+.day-card__editor-actions button:first-child {
+  border-color: var(--calcite-color-brand);
+  background: var(--calcite-color-brand);
+  color: var(--calcite-color-text-inverse);
+}
+
+.day-card__editor-actions button:focus-visible {
+  outline: 2px solid var(--calcite-color-brand);
+  outline-offset: 2px;
 }
 
 .day-card__stars {
@@ -212,7 +319,7 @@
 @media (max-width: 700px) {
   .dashboard {
     width: calc(100% - 2rem);
-    margin-top: 1rem;
+    padding-top: 1rem;
   }
 
   .welcome-panel {
@@ -224,5 +331,45 @@
 
   .progress-summary {
     flex-basis: auto;
+  }
+}
+
+@container home-layout (max-height: 30rem) {
+  .dashboard {
+    grid-template-columns: minmax(13rem, 18rem) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .welcome-panel {
+    grid-column: 1 / -1;
+  }
+
+  .day-browser {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .status-filters {
+    flex: 0 1 auto;
+  }
+
+  .day-grid,
+  .empty-state {
+    grid-column: 2;
+    grid-row: 2;
   }
 }

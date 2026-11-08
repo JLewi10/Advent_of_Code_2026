@@ -1,0 +1,83 @@
+<main class="day-workspace">
+  <header class="day-header">
+    <div class="day-header__identity">
+      <calcite-chip class="day-header__number" appearance="solid">
+        @if (dayNumber(); as number) {
+          DAY {{ number.toString().padStart(2, '0') }}
+        } @else {
+          DAY --
+        }
+      </calcite-chip>
+      <h1>{{ dayLabel() }}</h1>
+    </div>
+
+    <div class="day-header__actions">
+      <div class="day-header__parts" aria-label="Puzzle part status">
+        <calcite-chip icon="star" appearance="outline">Part 1 Unsolved</calcite-chip>
+        <calcite-chip icon="star" appearance="outline">Part 2 Unsolved</calcite-chip>
+      </div>
+      <calcite-button
+        class="day-header__run"
+        icon-start="play"
+        (click)="runCode()"
+      >
+        Run Code
+      </calcite-button>
+    </div>
+  </header>
+
+  @if (dayNumber() === null) {
+    <p class="day-error" role="alert">
+      That day number is invalid. <a routerLink="/">Return to the day list.</a>
+    </p>
+  } @else {
+    <section class="editor-section" aria-labelledby="solution-label">
+      <div class="editor-section__toolbar">
+        <label id="solution-label" for="solution-code">solution.ts</label>
+        <span>Solution editor</span>
+      </div>
+      <textarea
+        id="solution-code"
+        class="code-editor"
+        aria-label="TypeScript solution code"
+        spellcheck="false"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        placeholder="// Write your solution here..."
+        [value]="sourceCode()"
+        (input)="updateSourceCode($event)"
+      ></textarea>
+    </section>
+
+    <section class="input-section" aria-labelledby="puzzle-input-label">
+      <div class="section-heading">
+        <label id="puzzle-input-label" for="puzzle-input">Puzzle input</label>
+        <span>{{ puzzleInput().length }} characters</span>
+      </div>
+      <textarea
+        id="puzzle-input"
+        class="puzzle-input"
+        aria-label="Puzzle input"
+        spellcheck="false"
+        placeholder="Paste your puzzle input here..."
+        [value]="puzzleInput()"
+        (input)="updatePuzzleInput($event)"
+      ></textarea>
+    </section>
+
+    <section class="results-section" aria-labelledby="results-heading">
+      <div class="results-section__heading">
+        <h2 id="results-heading">Execution results</h2>
+        <span class="results-section__runtime">Total time: {{ runTime() }}</span>
+      </div>
+      <div class="result-panel" aria-live="polite">
+        <div class="result-panel__heading">
+          <h3>Console output</h3>
+          <span>{{ runTime() }}</span>
+        </div>
+        <pre>{{ executionMessage() }}</pre>
+      </div>
+    </section>
+  }
+</main>

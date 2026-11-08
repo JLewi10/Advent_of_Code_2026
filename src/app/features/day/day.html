@@ -9,6 +9,14 @@
         }
       </calcite-chip>
       <h1>{{ dayLabel() }}</h1>
+      <a
+        class="day-header__source-link"
+        [href]="adventOfCodeUrl()"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open Advent of Code day in a new tab"
+        >Review AoC puzzle details</a
+      >
     </div>
 
     <div class="day-header__actions">
@@ -16,11 +24,7 @@
         <calcite-chip icon="star" appearance="outline">Part 1 Unsolved</calcite-chip>
         <calcite-chip icon="star" appearance="outline">Part 2 Unsolved</calcite-chip>
       </div>
-      <calcite-button
-        class="day-header__run"
-        icon-start="play"
-        (click)="runCode()"
-      >
+      <calcite-button class="day-header__run" icon-start="play" (click)="runCode()">
         Run Code
       </calcite-button>
     </div>

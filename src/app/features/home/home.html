@@ -8,7 +8,7 @@
           aria-hidden="true"
           [style.color]="'var(--calcite-color-brand)'"
         ></calcite-icon>
-        <h1>Advent of Code 2026</h1>
+        <h1>Advent of Code {{ progress.selectedYear() }}</h1>
       </div>
       <p>Choose a day to open the web editor, write a solution, and keep track of your progress.</p>
     </div>
@@ -23,7 +23,7 @@
       <calcite-meter
         label="Overall Advent of Code progress"
         [min]="0"
-        [max]="totalStars"
+        [max]="totalStars()"
         [value]="solvedStars()"
         appearance="solid"
         fill-type="single"
@@ -127,9 +127,9 @@
           <div
             class="day-card__stars"
             slot="footer-start"
-            aria-label="{{ day.stars }} of 2 stars earned"
+            [attr.aria-label]="day.stars + ' of ' + starValues.length + ' stars earned'"
           >
-            @for (star of [1, 2]; track star) {
+            @for (star of starValues; track star) {
               <calcite-icon
                 [icon]="star <= day.stars ? 'star-f' : 'star'"
                 scale="s"

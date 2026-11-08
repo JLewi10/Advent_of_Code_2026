@@ -4,7 +4,8 @@ import {
   DAY_STATUSES,
   DAY_STATUS_LABELS,
   ProgressService,
-  TOTAL_STARS,
+  STAR_VALUES,
+  isDayStatus,
   type DayStatus,
   type PuzzleDay,
 } from '../../core/services';
@@ -24,7 +25,7 @@ type DayFilter = 'all' | DayStatus;
 })
 export class Home {
   protected readonly progress = inject(ProgressService);
-  protected readonly totalStars = TOTAL_STARS;
+  protected readonly totalStars = this.progress.totalStars;
   protected readonly days = this.progress.days;
   protected readonly editingDayNumber = signal<number | null>(null);
   protected readonly draftTitle = signal('');
@@ -32,6 +33,7 @@ export class Home {
   protected readonly editError = signal<string | null>(null);
   protected readonly statuses = DAY_STATUSES;
   protected readonly statusLabels = DAY_STATUS_LABELS;
+  protected readonly starValues = STAR_VALUES;
   protected readonly filters: { label: string; value: DayFilter }[] = [
     { label: 'All Days', value: 'all' },
     ...DAY_STATUSES,
@@ -41,7 +43,7 @@ export class Home {
   protected readonly searchQuery = signal('');
   protected readonly solvedStars = this.progress.solvedCount;
   protected readonly progressPercent = computed(() =>
-    Math.round((this.solvedStars() / this.totalStars) * 100),
+    Math.round((this.solvedStars() / this.totalStars()) * 100),
   );
   protected readonly filteredDays = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
@@ -93,7 +95,7 @@ export class Home {
 
   protected updateDraftStatus(event: Event): void {
     const status = (event.target as HTMLSelectElement).value;
-    if (this.isDayStatus(status)) {
+    if (isDayStatus(status)) {
       this.draftStatus.set(status);
     }
   }
@@ -115,9 +117,5 @@ export class Home {
   protected cancelDayEdit(): void {
     this.editingDayNumber.set(null);
     this.editError.set(null);
-  }
-
-  private isDayStatus(status: string): status is DayStatus {
-    return DAY_STATUSES.some((option) => option.value === status);
   }
 }

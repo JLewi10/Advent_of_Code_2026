@@ -23,10 +23,18 @@ export class Day {
 
   protected readonly dayNumber = computed(() => {
     const number = Number(this.routeParams().get('dayNumber'));
-    return Number.isInteger(number) && number >= 1 && number <= 25 ? number : null;
+    return Number.isInteger(number) && number >= 1 && number <= this.progress.dayCount()
+      ? number
+      : null;
   });
   protected readonly dayLabel = computed(() => {
     return this.progress.getDayTitle(this.dayNumber());
+  });
+  protected readonly adventOfCodeUrl = computed(() => {
+    const day = this.dayNumber();
+    return day === null
+      ? null
+      : `https://adventofcode.com/${this.progress.selectedYear()}/day/${day}`;
   });
   protected readonly sourceCode = signal('');
   protected readonly puzzleInput = signal('');

@@ -3,9 +3,34 @@
     <calcite-navigation-logo
       slot="logo"
       heading="Advent of Code"
-      description="2026 Progress Tracker"
+      [description]="selectedYear() + ' Progress Tracker'"
       icon="package"
     ></calcite-navigation-logo>
+    <calcite-button
+      id="year-picker-trigger"
+      slot="content-end"
+      appearance="transparent"
+      icon-end="chevron-down"
+      aria-label="Select Advent of Code year"
+    >
+      {{ selectedYear() }}
+    </calcite-button>
+    <calcite-dropdown
+      slot="content-end"
+      reference-element="year-picker-trigger"
+      placement="bottom-end"
+    >
+      <calcite-dropdown-group group-title="Advent of Code year" selection-mode="single">
+        @for (year of yearOptions; track year) {
+          <calcite-dropdown-item
+            [selected]="year === selectedYear()"
+            (calciteDropdownItemSelect)="selectYear(year)"
+          >
+            {{ year }}
+          </calcite-dropdown-item>
+        }
+      </calcite-dropdown-group>
+    </calcite-dropdown>
     @if (!isDashboard()) {
       <calcite-menu slot="content-end">
         <calcite-menu-item
@@ -21,7 +46,7 @@
       username="JLewi10"
     ></calcite-navigation-user>
     <calcite-chip slot="content-end" icon="star-f"
-      >Solved <b>{{ solvedCount() }} / 50</b></calcite-chip
+      >Solved <b>{{ solvedCount() }} / {{ totalStars() }}</b></calcite-chip
     >
   </calcite-navigation>
   <calcite-panel slot="panel-top">

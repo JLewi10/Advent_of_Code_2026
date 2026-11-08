@@ -1,40 +1,35 @@
 import { Service, computed, signal } from '@angular/core';
-
-export const DAY_STATUSES = [
-  { label: 'Not Started', value: 'not-started' },
-  { label: 'In Progress', value: 'in-progress' },
-  { label: 'Part 1 Solved', value: 'partially-solved' },
-  { label: 'Fully Solved', value: 'fully-solved' },
-] as const;
-
-export type DayStatus = (typeof DAY_STATUSES)[number]['value'];
-
-export interface PuzzleDay {
-  number: number;
-  title: string;
-  status: DayStatus;
-  stars: number;
-}
-
-export const DAY_STATUS_LABELS = Object.fromEntries(
-  DAY_STATUSES.map(({ label, value }) => [value, label]),
-) as Record<DayStatus, string>;
-
-export const TOTAL_STARS = 50;
-
-const STORAGE_KEY = 'advent-of-code-2026.days';
-const DAY_COUNT = 25;
+import {
+  STARS_PER_DAY,
+  starsForStatus,
+  type DayChanges,
+  type PuzzleDay,
+} from '../models/day-progress';
+import {
+  CURRENT_YEAR,
+  createDefaultDays,
+  dayCountForYear,
+  readDays,
+  readSelectedYear,
+  writeDays,
+  writeSelectedYear,
+  YEAR_OPTIONS,
+} from './progress-storage';
 
 @Service()
 export class ProgressService {
-  private readonly _storageError = signal<string | null>(null);
-  private readonly _days = signal(this.loadDays());
+  readonly yearOptions = YEAR_OPTIONS;
 
+  private readonly _storageError = signal<string | null>(null);
+  private readonly _selectedYear = signal(this.loadSelectedYear());
+  private readonly _days = signal(this.loadDays(this._selectedYear()));
+
+  readonly selectedYear = this._selectedYear.asReadonly();
   readonly days = this._days.asReadonly();
   readonly storageError = this._storageError.asReadonly();
-  readonly solvedCount = computed(() =>
-    this.days().reduce((total, day) => total + day.stars, 0),
-  );
+  readonly dayCount = computed(() => dayCountForYear(this.selectedYear()));
+  readonly totalStars = computed(() => this.dayCount() * STARS_PER_DAY);
+  readonly solvedCount = computed(() => this.days().reduce((total, day) => total + day.stars, 0));
 
   getDayTitle(dayNumber: number | null): string {
     if (dayNumber === null) {
@@ -44,112 +39,66 @@ export class ProgressService {
     return this.days().find((day) => day.number === dayNumber)?.title ?? `Day ${dayNumber} Puzzle`;
   }
 
-  updateDay(dayNumber: number, changes: Partial<PuzzleDay>): void {
-    const currentDays = this.days();
-    const dayIndex = currentDays.findIndex((day) => day.number === dayNumber);
-    if (dayIndex < 0) {
+  setSelectedYear(year: number): void {
+    if (!this.yearOptions.includes(year)) {
+      throw new RangeError(`Unsupported Advent of Code year: ${year}`);
+    }
+    if (year === this.selectedYear()) {
       return;
     }
 
-    const updatedDays = currentDays.map((day) =>
-      day.number === dayNumber
-        ? {
-            ...day,
-            ...changes,
-            stars: changes.status
-              ? this.starsForStatus(changes.status)
-              : (changes.stars ?? day.stars),
-          }
-        : day,
-    );
+    this._storageError.set(null);
+    this._selectedYear.set(year);
+    this.write('save the selected year', () => writeSelectedYear(year));
+    this._days.set(this.loadDays(year));
+  }
+
+  updateDay(dayNumber: number, changes: DayChanges): void {
+    const currentDays = this.days();
+    const dayIndex = currentDays.findIndex((day) => day.number === dayNumber);
+    if (dayIndex === -1) {
+      return;
+    }
+
+    const updatedDays = currentDays.slice();
+    const day = currentDays[dayIndex];
+    updatedDays[dayIndex] = {
+      ...day,
+      ...changes,
+      stars: changes.status ? starsForStatus(changes.status) : day.stars,
+    };
 
     this._days.set(updatedDays);
-    this.persistDays(updatedDays);
+    this.write('save progress', () => writeDays(this.selectedYear(), updatedDays));
   }
 
-  private createDefaultDays(): PuzzleDay[] {
-    return Array.from({ length: DAY_COUNT }, (_, index) => {
-      const number = index + 1;
-      return {
-        number,
-        title: `Day ${number} Puzzle`,
-        status: 'not-started',
-        stars: 0,
-      };
-    });
+  private loadSelectedYear(): number {
+    return this.read('load the selected year', CURRENT_YEAR, readSelectedYear);
   }
 
-  private loadDays(): PuzzleDay[] {
+  private loadDays(year: number): PuzzleDay[] {
+    return this.read('load saved progress', createDefaultDays(year), () => readDays(year));
+  }
+
+  private read<T>(action: string, fallback: T, load: () => T): T {
     try {
-      const storedDays = localStorage.getItem(STORAGE_KEY);
-      if (storedDays === null) {
-        return this.createDefaultDays();
-      }
-
-      const parsedDays: unknown = JSON.parse(storedDays);
-      if (!Array.isArray(parsedDays)) {
-        throw new Error('Saved progress must be a list of days.');
-      }
-
-      const defaults = this.createDefaultDays();
-      const daysByNumber = new Map<number, PuzzleDay>();
-      for (const savedDay of parsedDays) {
-        if (
-          typeof savedDay !== 'object' ||
-          savedDay === null ||
-          !('number' in savedDay) ||
-          !('title' in savedDay) ||
-          !('status' in savedDay) ||
-          !('stars' in savedDay) ||
-          typeof savedDay.number !== 'number' ||
-          !Number.isInteger(savedDay.number) ||
-          savedDay.number < 1 ||
-          savedDay.number > defaults.length ||
-          typeof savedDay.title !== 'string' ||
-          !this.isDayStatus(savedDay.status) ||
-          typeof savedDay.stars !== 'number' ||
-          !Number.isInteger(savedDay.stars) ||
-          savedDay.stars < 0 ||
-          savedDay.stars > 2 ||
-          daysByNumber.has(savedDay.number)
-        ) {
-          throw new Error('Saved progress contains an invalid day entry.');
-        }
-
-        daysByNumber.set(savedDay.number, {
-          number: savedDay.number,
-          title: savedDay.title,
-          status: savedDay.status,
-          stars: savedDay.stars,
-        });
-      }
-
-      return defaults.map((day) => daysByNumber.get(day.number) ?? day);
+      return load();
     } catch (error) {
-      const details = error instanceof Error ? error.message : 'Unknown storage error.';
-      this._storageError.set(`Could not load saved progress: ${details}`);
-      return this.createDefaultDays();
+      this._storageError.set(`Could not ${action}: ${this.errorMessage(error)}`);
+      return fallback;
     }
   }
 
-  private persistDays(days: PuzzleDay[]): void {
+  private write(action: string, save: () => void): void {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(days));
+      save();
       this._storageError.set(null);
     } catch (error) {
-      const details = error instanceof Error ? error.message : 'Unknown storage error.';
-      this._storageError.set(`Could not save progress to this browser: ${details}`);
+      this._storageError.set(`Could not ${action} to this browser: ${this.errorMessage(error)}`);
     }
   }
 
-  private isDayStatus(status: unknown): status is DayStatus {
-    return DAY_STATUSES.some((option) => option.value === status);
-  }
-
-  private starsForStatus(status: DayStatus): number {
-    if (status === 'partially-solved') {
-      return 1;
-    }
-    return status === 'fully-solved' ? 2 : 0;
+  private errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : 'Unknown storage error.';
   }
 }

@@ -41,6 +41,27 @@
   white-space: nowrap;
 }
 
+.day-header__source-link {
+  flex: 0 0 auto;
+  color: #00c81a;
+  font-family: var(--calcite-font-family-monospace);
+  font-size: 1rem;
+  text-decoration: none;
+  text-shadow: 0 0 0.35rem rgb(0 200 26 / 45%);
+}
+
+.day-header__source-link:hover,
+.day-header__source-link:focus-visible {
+  color: #39ff4e;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.day-header__source-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
 .day-header__number {
   flex: 0 0 auto;
   --calcite-chip-background-color: var(--calcite-color-brand);
